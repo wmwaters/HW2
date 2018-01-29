@@ -15,6 +15,8 @@ from flask import Flask, request, render_template, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, ValidationError
 from wtforms.validators import Required
+import json
+import requests
 
 #####################
 ##### APP SETUP #####
@@ -43,6 +45,28 @@ def hello_world():
 def hello_user(name):
     return '<h1>Hello {0}<h1>'.format(name)
 
+@app.route('/artistform')
+def artist_form():
+	return render_template('artistform.html')
+
+@app.route('/artistinfo')
+def artist_info():
+	artist_name = request.args.get('artist')
+	req = requests.get('https://itunes.apple.com/search?term=' + artist_name + '&media=music&attribute=artistTerm')
+	json_req = json.loads(req.text)
+	obj = json_req['results']
+	return render_template('artist_info.html', objects = obj)
+
+@app.route('/artistlinks')
+def artist_links():
+	return render_template('artist_links.html')
+
+@app.route('/specific/song/<artist_name>')
+def spec_artist(artist_name):
+	req = requests.get('https://itunes.apple.com/search?term=' + artist_name + '&media=music&attribute=artistTerm')
+	json_req = json.loads(req.text)
+	obj = json_req['results']
+	return render_template('specific_artist.html', results = obj)
 
 if __name__ == '__main__':
     app.run(use_reloader=True,debug=True)
