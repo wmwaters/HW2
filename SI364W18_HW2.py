@@ -11,6 +11,7 @@
 #############################
 ##### IMPORT STATEMENTS #####
 #############################
+
 from flask import Flask, request, render_template, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, ValidationError
@@ -29,8 +30,10 @@ app.config['SECRET_KEY'] = 'hardtoguessstring'
 ###### FORMS #######
 ####################
 
-
-
+class AlbumEntryForm(FlaskForm):
+	album_name = StringField('Enter the name of an album:', validators = [Required()])
+	like_num = RadioField('How much do you like this album? (1 low, 3 high)', choices = [(1, '1'), (2, '2'), (3, '3')], validators = [Required()])
+	submit = SubmitField('Submit')
 
 ####################
 ###### ROUTES ######
@@ -39,7 +42,6 @@ app.config['SECRET_KEY'] = 'hardtoguessstring'
 @app.route('/')
 def hello_world():
     return 'Hello World!'
-
 
 @app.route('/user/<name>')
 def hello_user(name):
@@ -68,15 +70,10 @@ def spec_artist(artist_name):
 	obj = json_req['results']
 	return render_template('specific_artist.html', results = obj)
 
-class AlbumEntryForm(FlaskForm):
-	album_name = StringField('Enter the name of an album:', validators = [Required()])
-	like_num = RadioField('How much do you like this album? (1 low, 3 high)', choices = [(1, '1'), (2, '2'), (3, '3')], validators = [Required()])
-	submit = SubmitField('Submit')
-
 @app.route('/album_entry')
 def album_entry():
-		form = AlbumEntryForm()
-		return render_template('album_entry.html', form = form)
+	form = AlbumEntryForm()
+	return render_template('album_entry.html', form = form)
 
 @app.route('/album_result')
 def album_result():
